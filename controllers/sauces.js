@@ -1,13 +1,18 @@
 const Sauce = require("../models/sauce");
 const fs = require("fs");
-
+const xss = require("xss");
 
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
   delete sauceObject._userId;
+  console.log(sauceObject);
   const sauce = new Sauce({
-    ...sauceObject,
+    name: xss(sauceObject.name),
+    manufacturer: xss(sauceObject.manufacturer),
+    description: xss(sauceObject.description),
+    mainPepper: xss(sauceObject.mainPepper),
+    heat: sauceObject.heat,
     userId: req.auth.userId,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename
@@ -42,7 +47,14 @@ exports.modifySauce = (req, res, next) => {
       } else {
         Sauce.updateOne(
           { _id: req.params.id },
-          { ...sauceObject, _id: req.params.id }
+          {
+            ...sauceObject,
+            name: xss(sauceObject.name),
+            manufacturer: xss(sauceObject.manufacturer),
+            description: xss(sauceObject.description),
+            mainPepper: xss(sauceObject.mainPepper),
+            _id: req.params.id,
+          }
         )
           .then(() => res.status(200).json({ message: "Objet modifié!" }))
           .catch((error) => res.status(401).json({ error }));
