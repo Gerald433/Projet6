@@ -2,9 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const path = require("path");
-require ('dotenv').config();
+require("dotenv").config();
 const routeSauce = require("./routes/sauce");
 const userRoutes = require("./routes/user");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const session = require("express-session");
+const nocache = require("nocache");
+const rateLimit = require('express-rate-limit')
 
 mongoose
   .connect(
@@ -19,6 +24,39 @@ mongoose
 
 app.use(express.json());
 
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 100, 
+	standardHeaders: true, 
+	legacyHeaders: false, 
+})
+
+app.use(limiter)
+
+
+app.use(nocache());
+
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+      maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: true,
+      secure: false, //mettre à true en production
+    },
+  })
+);
+
+app.use(mongoSanitize());
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 app.use((req, res, next) => {
   console.log("traitement des headers");
   res.setHeader("Access-Control-Allow-Origin", "*");
