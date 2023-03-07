@@ -7,7 +7,7 @@ const emailValidator = require("email-validator");
 const passwordValidator = require("password-validator");
 
 function isSecurePassword(password) {
-  var schema = new passwordValidator();
+  const schema = new passwordValidator();
 
   // Add properties to it
   schema
@@ -23,13 +23,15 @@ function isSecurePassword(password) {
     .digits(2) // Must have at least 2 digits
     .has()
     .not()
-    .spaces(); // Should not have spaces
+    .spaces() // Should not have spaces
+    .has()
+    .symbols();
 
   return schema.validate(password);
 }
 
 exports.signup = (req, res, next) => {
-  if (isSecurePassword(req.body.password)) {
+  if (!isSecurePassword(req.body.password)) {
     res.status(400).json({ error: "unsecure password" });
     return;
   }
@@ -37,7 +39,6 @@ exports.signup = (req, res, next) => {
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
-      console.log("ok");
       if (!emailValidator.validate(req.body.email)) {
         throw new Error("adresse email invalide");
       }
@@ -49,7 +50,6 @@ exports.signup = (req, res, next) => {
         .save()
         .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
         .catch((error) => res.status(400).json({ error }));
-      console.log("ca passe");
     })
     .catch((error) => {
       console.error(error);
