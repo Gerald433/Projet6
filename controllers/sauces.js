@@ -6,7 +6,6 @@ exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
   delete sauceObject._userId;
-  console.log(sauceObject);
   const sauce = new Sauce({
     name: xss(sauceObject.name),
     manufacturer: xss(sauceObject.manufacturer),
@@ -137,8 +136,6 @@ exports.likeSauce = (req, res) => {
       } else {
         res.status(500).json({ error: "Procédure de Like inatendue" });
       }
-
-      console.log(sauce);
 
       Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => res.status(200).json({ message: "Objet modifié!" }))

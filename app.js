@@ -9,7 +9,7 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const session = require("express-session");
 const nocache = require("nocache");
-const rateLimit = require('express-rate-limit')
+const rateLimit = require("express-rate-limit");
 
 mongoose
   .connect(
@@ -25,14 +25,13 @@ mongoose
 app.use(express.json());
 
 const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000,
-	max: 100, 
-	standardHeaders: true, 
-	legacyHeaders: false, 
-})
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-app.use(limiter)
-
+app.use(limiter);
 
 app.use(nocache());
 
@@ -58,7 +57,6 @@ app.use(
   })
 );
 app.use((req, res, next) => {
-  console.log("traitement des headers");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",

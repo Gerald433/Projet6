@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
-  console.log("traitement de lauthentification");
   try {
     if (!req.headers.authorization)
       throw new Error("Header Authorization not specified ! ");
